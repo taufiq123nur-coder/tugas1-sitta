@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Mengatur layout kartu (card) statistik menjadi sistem grid (kotak-kotak) */
+        .dashboard-grid {
+            display: grid;
+            /* Kolom akan menyesuaikan otomatis lebarnya, minimal 250px */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; /* Jarak antar kartu */
+            margin-bottom: 30px;
+        }
+
+        /* Desain kotak/kartu statistik */
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow); /* Bayangan lembut dari style.css */
+            display: flex;
+            align-items: center; /* Meratakan ikon dan teks di tengah */
+            gap: 20px;
+            border-left: 5px solid var(--secondary-color); /* Garis tebal di sisi kiri */
+            transition: transform 0.3s ease; /* Animasi bergerak lambat */
+        }
+
+        /* Efek melayang ke atas saat kartu di-hover (disentuh mouse) */
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Desain lingkaran ikon di dalam kartu statistik */
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(249, 168, 38, 0.1); /* Warna kuning transparan */
+            color: var(--secondary-color);
+            border-radius: 50%; /* Membuat kotak menjadi lingkaran sempurna */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px; /* Ukuran ikon */
+        }
+
+        /* Teks judul di dalam kartu statistik (misal: "Total Pesanan") */
+        .stat-info h4 {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        /* Angka besar di dalam kartu statistik */
+        .stat-info h2 {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        /* --- Pengaturan Sub-menu (Dropdown) di Sidebar --- */
+        .dropdown {
+            position: relative;
+        }
+
+        /* Kotak isi sub-menu awalnya disembunyikan (display: none) */
+        .dropdown-content {
+            display: none;
+            flex-direction: column;
+            background-color: rgba(0,0,0,0.1); /* Menggelapkan latar sub-menu sedikit */
+            padding-left: 35px; /* Menjorok ke dalam */
+        }
+
+        /* Jika memiliki class 'active' (diklik), maka tampilkan sub-menu (display: flex) */
+        .dropdown.active .dropdown-content {
+            display: flex;
+        }
+
+        /* Pengaturan desain teks tautan (link) di dalam sub-menu */
+        .dropdown-content a {
+            padding: 8px 15px !important;
+            font-size: 14px;
+            border-left: none !important; /* Hilangkan garis indikator kuning dari style utama */
+        }
+        
+        /* Tambahkan simbol strip (-) sebelum teks link sub-menu */
+        .dropdown-content a::before {
+            content: '-';
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Wadah Utama Aplikasi (Sidebar + Konten) -->
+    <div class="app-container">
+        <!-- Bagian Sidebar (Menu Navigasi di Kiri) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <img src="img/logo-ut.png" alt="Logo UT" style="width: 35px;">
+                    SITTA
+                </h2>
+                <p style="font-size: 12px; color: #aaa;">Sistem Informasi Tiras & Transaksi</p>
+            </div>
+            
+            <!-- Daftar Menu Tautan Halaman -->
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="stok.html"><i class="fas fa-boxes"></i> Informasi Bahan Ajar</a></li>
+                <li><a href="tracking.html"><i class="fas fa-truck"></i> Tracking Pengiriman</a></li>
+                
+                <!-- Menu Dropdown Laporan -->
+                <li class="dropdown" id="laporanDropdown">
+                    <a href="#" onclick="toggleDropdown(event)"><i class="fas fa-chart-bar"></i> Laporan <i class="fas fa-chevron-down" style="margin-left: auto; margin-right: 0; font-size: 12px;"></i></a>
+                    <div class="dropdown-content">
+                        <a href="#">Monitoring Progress DO</a>
+                        <a href="#">Rekap Bahan Ajar</a>
+                    </div>
+                </li>
+                
+                <li><a href="#"><i class="fas fa-history"></i> Histori Transaksi</a></li>
+                <li style="margin-top: 50px;">
+                    <a href="#" onclick="logout()" style="color: #ff6b6b;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Bagian Konten Utama (Sebelah Kanan) -->
+        <main class="main-content">
+            <!-- Bar Atas (Header/Topbar) -->
+            <div class="topbar">
+                <div class="greeting">
+                    <h3 id="greetingText">Selamat Pagi, User!</h3>
+                    <p style="font-size: 14px; color: var(--text-light);" id="currentDate"></p>
+                </div>
+                <div class="user-info">
+                    <div style="text-align: right;">
+                        <strong id="userNameDisplay">User</strong>
+                        <div style="font-size: 12px; color: var(--text-light);" id="userRoleDisplay">Administrator</div>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="User Profile" style="width: 40px; height: 40px; border-radius: 50%;" id="userAvatar">
+                </div>
+            </div>
+
+            <!-- Grid Kartu Statistik (4 Kolom) -->
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="stat-info">
+                        <h4>Total Pesanan</h4>
+                        <h2>1,250</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+                    <div class="stat-info">
+                        <h4>Stok Tersedia</h4>
+                        <h2 id="totalStokDisplay">5,432</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-truck-loading"></i></div>
+                    <div class="stat-info">
+                        <h4>Sedang Dikirim</h4>
+                        <h2>340</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h4>Pesanan Selesai</h4>
+                        <h2>890</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kartu Informasi Tambahan -->
+            <div class="card">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Informasi Terbaru</h3>
+                <p>Selamat datang di aplikasi SITTA. Gunakan menu navigasi di sebelah kiri untuk melakukan tracking pengiriman dan mengecek stok bahan ajar.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Menghubungkan file Dummy Data Javascript -->
+    <script src="js/data.js"></script>
+    <script>
+        // --- CEK STATUS LOGIN ---
+        // Mengambil data user yang sedang login dari localStorage (penyimpanan sementara di browser)
+        const loggedInUser = JSON.parse(localStorage.getItem('userLoggedIn'));
+        
+        // Jika tidak ada data user (artinya belum login), paksa pindah ke halaman login
+        if(!loggedInUser) {
+            window.location.href = 'login.html';
+        } else {
+            // Jika sudah login, tampilkan nama, role, dan lokasi di bar atas (topbar)
+            document.getElementById('userNameDisplay').textContent = loggedInUser.nama;
+            document.getElementById('userRoleDisplay').textContent = loggedInUser.role + " - " + loggedInUser.lokasi;
+            
+            // Generate avatar otomatis berdasarkan nama menggunakan API UI-Avatars
+            document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(loggedInUser.nama)}&background=16213E&color=fff`;
+        }
+
+        // --- FUNGSI SAPAAN BERDASARKAN WAKTU LOKAL ---
+        function updateGreeting() {
+            // Mengambil jam saat ini dari sistem/komputer user
+            const hour = new Date().getHours();
+            let greeting = 'Selamat Pagi';
+            
+            // Logika pergantian sapaan:
+            if(hour >= 11 && hour < 15) greeting = 'Selamat Siang'; // 11.00 - 14.59
+            else if(hour >= 15 && hour < 18) greeting = 'Selamat Sore'; // 15.00 - 17.59
+            else if(hour >= 18) greeting = 'Selamat Malam'; // Di atas jam 18.00
+
+            // Menampilkan sapaan beserta nama depan user
+            const name = loggedInUser ? loggedInUser.nama.split(' ')[0] : 'User';
+            document.getElementById('greetingText').textContent = `${greeting}, ${name}!`;
+
+            // Menampilkan tanggal hari ini dengan format Bahasa Indonesia
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', options);
+        }
+        
+        // --- FUNGSI MENGHITUNG TOTAL STOK DARI DATA ---
+        function updateTotalStok() {
+            // Menjumlahkan semua atribut 'stok' dari daftar dataBahanAjar
+            let total = 0;
+            dataBahanAjar.forEach(item => {
+                total += parseInt(item.stok);
+            });
+            // Mengubah teks angka di Dashboard menggunakan format ribuan (misal 5432 jadi 5.432)
+            document.getElementById('totalStokDisplay').textContent = total.toLocaleString('id-ID');
+        }
+
+        // Jalankan fungsi sapaan dan hitung stok saat halaman dimuat
+        updateGreeting();
+        updateTotalStok();
+
+        // --- FUNGSI DROPDOWN MENU LAPORAN ---
+        // Fungsi untuk membuka/tutup sub-menu "Laporan" di Sidebar
+        function toggleDropdown(e) {
+            e.preventDefault(); // Mencegah link pindah halaman
+            document.getElementById('laporanDropdown').classList.toggle('active');
+        }
+
+        // --- FUNGSI LOGOUT ---
+        // Fungsi untuk keluar dari aplikasi
+        function logout() {
+            // Hapus data sesi di browser
+            localStorage.removeItem('userLoggedIn');
+            // Arahkan kembali ke halaman login
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

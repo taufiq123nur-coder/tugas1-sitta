@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA - Informasi Bahan Ajar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Kontainer untuk membungkus tabel agar bisa digeser (scroll) ke samping jika layarnya kecil */
+        .table-container {
+            overflow-x: auto;
+            background: var(--white); /* Latar belakang putih */
+            border-radius: 10px; /* Sudut membulat */
+            box-shadow: var(--shadow); /* Efek bayangan */
+        }
+
+        /* Desain dasar tabel HTML */
+        table {
+            width: 100%; /* Memenuhi seluruh lebar kontainer */
+            border-collapse: collapse; /* Menghilangkan jarak antar garis batas (border) sel */
+            text-align: left;
+        }
+
+        /* Desain untuk setiap sel tabel, baik Header (th) maupun Data (td) */
+        th, td {
+            padding: 15px; /* Jarak antara teks dan garis batas */
+            border-bottom: 1px solid #eee; /* Garis pemisah bawah berwarna abu-abu sangat terang */
+        }
+
+        /* Desain khusus untuk baris Header/Judul Tabel */
+        th {
+            background-color: var(--primary-light); /* Warna latar biru gelap */
+            color: var(--white); /* Warna teks putih */
+            font-weight: 500; /* Ketebalan font sedang */
+            white-space: nowrap; /* Mencegah teks judul terpotong/turun ke bawah */
+        }
+
+        /* Efek sorotan saat baris tabel (tr) dilewati mouse (hover) */
+        tr:hover {
+            background-color: #f8fafc; /* Latar berubah sedikit kebiruan pudar */
+        }
+
+        /* Desain khusus untuk gambar sampul (cover) buku */
+        .cover-img {
+            width: 50px;
+            height: 70px;
+            object-fit: cover; /* Mencegah gambar gepeng, memotong bagian yang tidak muat */
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Desain Label/Badge untuk tulisan Angka Stok */
+        .stok-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px; /* Bentuk lonjong seperti pil */
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(40, 167, 69, 0.1); /* Latar hijau transparan (aman) */
+            color: var(--success); /* Teks warna hijau */
+        }
+
+        /* Perubahan warna badge menjadi merah jika ditambahkan class 'low' (stok menipis) */
+        .stok-badge.low {
+            background: rgba(233, 69, 96, 0.1); /* Latar merah transparan */
+            color: var(--danger); /* Teks warna merah */
+        }
+
+        /* Mengatur posisi tombol 'Tambah Stok' agar berseberangan dengan Judul Halaman */
+        .action-bar {
+            display: flex;
+            justify-content: space-between; /* Menjauhkan elemen ke sisi berlawanan */
+            align-items: center; /* Meratakan ke tengah vertikal */
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kotak Pesan Peringatan (Toast/Alert) -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Pesan</span>
+    </div>
+
+    <!-- Wadah Utama Aplikasi (Sidebar + Konten) -->
+    <div class="app-container">
+        <!-- Bagian Sidebar (Menu Navigasi di Kiri) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <img src="img/logo-ut.png" alt="Logo UT" style="width: 35px;">
+                    SITTA
+                </h2>
+            </div>
+            <!-- Daftar Menu Tautan Halaman -->
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="stok.html" class="active"><i class="fas fa-boxes"></i> Informasi Bahan Ajar</a></li>
+                <li><a href="tracking.html"><i class="fas fa-truck"></i> Tracking Pengiriman</a></li>
+                <li><a href="#" onclick="logout()" style="color: #ff6b6b; margin-top: 50px;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Bagian Konten Utama (Sebelah Kanan) -->
+        <main class="main-content">
+            <!-- Baris Aksi (Judul dan Tombol Tambah Data) -->
+            <div class="action-bar">
+                <h2 style="color: var(--primary-color);">Data Stok Bahan Ajar</h2>
+                <!-- Tombol ini akan memanggil fungsi openStok Javascript -->
+                <button class="btn btn-secondary" onclick="openStok('addStokPopup')"><i class="fas fa-plus"></i> Tambah Stok Baru</button>
+            </div>
+
+            <!-- Wadah Tabel Data Bahan Ajar -->
+            <div class="table-container">
+                <table id="stokTable">
+                    <!-- Judul Kolom Tabel (Header) -->
+                    <thead>
+                        <tr>
+                            <th>Cover</th>
+                            <th>Kode Lokasi</th>
+                            <th>Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th>Jenis</th>
+                            <th>Edisi</th>
+                            <th>Stok</th>
+                        </tr>
+                    </thead>
+                    <!-- Isi Baris Tabel (Body) -->
+                    <tbody id="stokTableBody">
+                        <!-- Baris tabel (tr) dan kolom (td) akan dimasukkan secara otomatis oleh Javascript di ruang kosong ini -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Kotak Pop-Up (Stok Box) untuk Formulir Tambah Stok -->
+    <div id="addStokPopup" class="stok">
+        <div class="stok-content" style="max-width: 500px;">
+            <!-- Tombol silang untuk menutup stok -->
+            <span class="close" onclick="closeStok('addStokPopup')">&times;</span>
+            <h3 style="margin-bottom: 20px; color: var(--primary-color);">Tambah Data Bahan Ajar Baru</h3>
+            
+            <!-- Formulir Input -->
+            <form id="addStokForm">
+                <div class="form-group">
+                    <label>Kode Lokasi</label>
+                    <input type="text" id="inputLokasi" required>
+                </div>
+                <div class="form-group">
+                    <label>Kode Barang</label>
+                    <input type="text" id="inputKode" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama Barang (Judul)</label>
+                    <input type="text" id="inputNama" required>
+                </div>
+                <!-- Layout Bersebelahan Menggunakan CSS Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <input type="text" id="inputJenis" value="BMP" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Edisi</label>
+                        <input type="number" id="inputEdisi" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah Stok</label>
+                        <input type="number" id="inputStok" required>
+                    </div>
+                </div>
+                <!-- Tombol Submit (Kirim Form) -->
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Simpan Data</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Menghubungkan file Dummy Data Javascript -->
+    <script src="js/data.js"></script>
+    <script>
+        // --- CEK STATUS LOGIN ---
+        // Memastikan hanya user yang sudah login yang bisa mengakses halaman ini
+        if(!localStorage.getItem('userLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        // --- FUNGSI MENAMPILKAN DATA TABEL STOK ---
+        function renderTable() {
+            // Ambil elemen <tbody> tempat kita akan memasukkan baris-baris data
+            const tbody = document.getElementById('stokTableBody');
+            tbody.innerHTML = ''; // Bersihkan isi tabel sebelum memasukkan data baru
+
+            // Melakukan perulangan (looping) untuk setiap data bahan ajar dari data.js
+            dataBahanAjar.forEach(item => {
+                const tr = document.createElement('tr'); // Buat elemen baris (<tr>) baru
+                
+                // Cek apakah ada link gambar cover, jika kosong gunakan gambar cadangan (placeholder)
+                const coverSrc = item.cover ? item.cover : 'https://via.placeholder.com/50x70.png?text=No+Cover';
+                
+                // Menentukan warna badge stok
+                let stokClass = 'stok-badge'; // Warna hijau secara default
+                // Jika stok di bawah 200, ubah menjadi warna merah (class 'low')
+                if(parseInt(item.stok) < 200) stokClass += ' low';
+
+                // Isi elemen baris (<tr>) dengan kode HTML beserta data spesifik per baris
+                tr.innerHTML = `
+                    <td><img src="${coverSrc}" class="cover-img" alt="Cover ${item.namaBarang}" onerror="this.src='https://via.placeholder.com/50x70.png?text=No+Image'"></td>
+                    <td><span style="font-family: monospace; background: #eee; padding: 3px 8px; border-radius: 4px;">${item.kodeLokasi}</span></td>
+                    <td><strong>${item.kodeBarang}</strong></td>
+                    <td>${item.namaBarang}</td>
+                    <td>${item.jenisBarang}</td>
+                    <td>${item.edisi}</td>
+                    <td><span class="${stokClass}">${item.stok}</span></td>
+                `;
+                
+                // Masukkan baris (<tr>) yang sudah dibuat ke dalam <tbody> tabel
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Jalankan fungsi tampilkan tabel saat halaman pertama kali dibuka
+        renderTable();
+
+        // --- KUMPULAN FUNGSI STOK BOX (TAMBAH STOK) ---
+        // Buka stok
+        function openStok(id) {
+            const stok = document.getElementById(id);
+            stok.style.display = 'flex';
+            setTimeout(() => {
+                stok.classList.add('show');
+            }, 10);
+        }
+
+        // Tutup stok
+        function closeStok(id) {
+            const stok = document.getElementById(id);
+            stok.classList.remove('show');
+            setTimeout(() => {
+                stok.style.display = 'none';
+            }, 300);
+        }
+
+        // Menutup saat mengklik di luar area stok
+        window.onclick = function(event) {
+            if (event.target.classList.contains('stok')) {
+                closeStok(event.target.id);
+            }
+        }
+
+        // --- FUNGSI TOAST / ALERT ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('success', 'show'); // Tampilkan pesan sukses warna hijau
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000); // Hilang setelah 3 detik
+        }
+
+        // --- LOGIKA MENAMBAH BARIS STOK BARU ---
+        // Event saat tombol Submit di dalam form ditekan
+        document.getElementById('addStokForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Cegah reload halaman
+            
+            // Susun data baru berdasarkan isian yang diketikkan pengguna pada form
+            const newData = {
+                kodeLokasi: document.getElementById('inputLokasi').value,
+                kodeBarang: document.getElementById('inputKode').value,
+                namaBarang: document.getElementById('inputNama').value,
+                jenisBarang: document.getElementById('inputJenis').value,
+                edisi: document.getElementById('inputEdisi').value,
+                stok: document.getElementById('inputStok').value,
+                cover: "" // Dikosongkan karena tidak ada fitur upload foto pada soal
+            };
+
+            // Masukkan (push) data baru tersebut ke dalam array utama di Javascript
+            dataBahanAjar.push(newData);
+            
+            // Panggil ulang fungsi tampilkan tabel agar baris barunya otomatis muncul
+            renderTable();
+            
+            // Menutup pop-up (stok) dan mengosongkan kembali isi form-nya
+            closeStok('addStokPopup');
+            this.reset();
+            
+            // Tampilkan notifikasi keberhasilan di layar
+            showToast('Data stok berhasil ditambahkan!');
+        });
+
+        // --- FUNGSI LOGOUT ---
+        function logout() {
+            localStorage.removeItem('userLoggedIn');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

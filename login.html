@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Mengatur posisi konten agar selalu berada di tengah layar secara vertikal dan horizontal */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Latar belakang berupa gradasi warna (dari biru gelap ke biru yang lebih gelap) */
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+        }
+
+        /* Kotak putih tempat formulir login berada */
+        .login-container {
+            background: rgba(255, 255, 255, 0.95); /* Putih dengan sedikit transparansi */
+            padding: 40px;
+            border-radius: 15px; /* Membuat sudut kotak membulat */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); /* Efek bayangan */
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            backdrop-filter: blur(10px); /* Efek blur kaca pada background */
+        }
+
+        /* Area penempatan logo dan judul teks */
+        .logo-area {
+            margin-bottom: 30px;
+        }
+
+        .logo-area h1 {
+            color: var(--primary-color);
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .logo-area p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Kotak pengelompokan input form */
+        .form-group {
+            text-align: left;
+            position: relative; /* Digunakan agar icon di dalamnya bisa diatur dengan posisi absolut */
+        }
+
+        /* Ikon (huruf kunci/surat) di dalam kotak input */
+        .form-group i {
+            position: absolute;
+            top: 40px;
+            left: 15px;
+            color: var(--text-light);
+        }
+
+        /* Memberikan jarak ekstra (padding-left) agar teks input tidak menabrak ikon */
+        .form-group input {
+            padding-left: 40px;
+        }
+
+        /* Modifikasi desain khusus untuk tombol login */
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        /* Area tautan Lupa Password & Daftar */
+        .login-links {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between; /* Menjauhkan tautan kiri dan kanan */
+            font-size: 14px;
+        }
+
+        .login-links a {
+            color: var(--primary-color);
+            text-decoration: none; /* Menghilangkan garis bawah pada link */
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition); /* Efek perubahan warna perlahan */
+        }
+
+        /* Warna link berubah menjadi warna kuning saat mouse diarahkan (hover) */
+        .login-links a:hover {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kotak Pesan Peringatan (Toast/Alert) -->
+    <div id="toast" class="toast">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="toast-message">Pesan</span>
+    </div>
+
+    <!-- Kotak Utama Login -->
+    <div class="login-container">
+        <!-- Area Logo dan Judul Aplikasi -->
+        <div class="logo-area">
+            <img src="img/logo-ut.png" alt="Logo UT" style="width: 80px; margin-bottom: 15px;">
+            <h1>SITTA</h1>
+            <p>Sistem Informasi Tiras dan Transaksi Bahan Ajar</p>
+        </div>
+        
+        <!-- Formulir Input Email dan Password -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" placeholder="Masukkan email anda">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Masukkan password anda">
+            </div>
+            <!-- Tombol Submit (Login) -->
+            <button type="submit" class="btn btn-primary btn-login">Login <i class="fas fa-sign-in-alt ml-2"></i></button>
+        </form>
+
+        <!-- Tautan Tambahan (Lupa Password & Daftar Akun) -->
+        <div class="login-links">
+            <a onclick="openStok('forgotPopup')">Lupa Password?</a>
+            <a onclick="openStok('registerPopup')">Daftar Akun Baru</a>
+        </div>
+    </div>
+
+    <!-- Kotak Pop-Up (Stok Box) untuk Lupa Password -->
+    <div id="forgotPopup" class="stok">
+        <div class="stok-content">
+            <span class="close" onclick="closeStok('forgotPopup')">&times;</span>
+            <h3 style="margin-bottom: 20px; color: var(--primary-color);">Lupa Password</h3>
+            <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-light);">Masukkan email yang terdaftar untuk menerima tautan reset password.</p>
+            <div class="form-group">
+                <input type="email" id="forgotEmail" placeholder="Email Anda" required>
+            </div>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="submitForgot()">Kirim Link Reset</button>
+        </div>
+    </div>
+
+    <!-- Kotak Pop-Up (Stok Box) untuk Daftar Akun Baru -->
+    <div id="registerPopup" class="stok">
+        <div class="stok-content">
+            <span class="close" onclick="closeStok('registerPopup')">&times;</span>
+            <h3 style="margin-bottom: 20px; color: var(--primary-color);">Daftar Akun</h3>
+            <div class="form-group">
+                <input type="text" id="regName" placeholder="Nama Lengkap" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="regEmail" placeholder="Email UT (@ut.ac.id)" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="regPassword" placeholder="Password" required>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="submitRegister()">Daftar</button>
+        </div>
+    </div>
+
+    <!-- Menghubungkan file Dummy Data Javascript -->
+    <script src="js/data.js"></script>
+    <script>
+        // --- KUMPULAN FUNGSI STOK BOX ---
+        
+        // Fungsi untuk membuka (menampilkan) Stok Box
+        function openStok(id) {
+            const stok = document.getElementById(id);
+            stok.style.display = 'flex'; // Ubah display dari none menjadi flex agar terlihat
+            
+            // Memberikan sedikit jeda sebelum menambahkan class 'show' agar efek animasi (transisi css) berjalan
+            setTimeout(() => {
+                stok.classList.add('show');
+            }, 10);
+        }
+
+        // Fungsi untuk menutup Stok Box
+        function closeStok(id) {
+            const stok = document.getElementById(id);
+            stok.classList.remove('show'); // Hapus class show untuk memicu animasi keluar
+            
+            // Tunggu animasi CSS selesai (300ms) sebelum benar-benar menyembunyikan elemen
+            setTimeout(() => {
+                stok.style.display = 'none';
+            }, 300);
+        }
+
+        // Fungsi bawaan Window: Menutup stok ketika user mengklik area gelap di luar kotak stok
+        window.onclick = function(event) {
+            if (event.target.classList.contains('stok')) {
+                event.target.classList.remove('show');
+                setTimeout(() => {
+                    event.target.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // --- FUNGSI TOAST / ALERT BOX ---
+        // Fungsi untuk menampilkan pesan pop-up kecil di pojok kanan atas
+        function showToast(message, isSuccess = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const icon = toast.querySelector('i');
+            
+            toastMessage.textContent = message; // Ubah isi teks pesan
+            
+            // Cek apakah ini pesan sukses atau gagal (error)
+            if(isSuccess) {
+                toast.classList.add('success'); // Tambahkan warna hijau
+                icon.className = 'fas fa-check-circle'; // Ganti icon centang
+            } else {
+                toast.classList.remove('success'); // Hapus warna hijau (kembali ke merah)
+                icon.className = 'fas fa-exclamation-circle'; // Ganti icon peringatan
+            }
+
+            toast.classList.add('show'); // Tampilkan toast
+            
+            // Sembunyikan otomatis setelah 3 detik (3000 ms)
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- LOGIKA UTAMA: PROSES LOGIN ---
+        // Menangkap event ketika tombol "Login" ditekan (form di-submit)
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah halaman me-refresh/reload saat form dikirim
+            
+            // Mengambil nilai (value) yang diketik user di kolom email dan password
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Validasi 1: Jika email atau password belum diisi
+            if (!email || !password) {
+                showToast("password atau user harus di isi");
+                return; // Hentikan proses selanjutnya
+            }
+
+            // Validasi 2: Mencari di array 'dataPengguna' (berasal dari data.js) 
+            // apakah ada kecocokan email DAN password.
+            const user = dataPengguna.find(u => u.email === email && u.password === password);
+
+            if(user) {
+                // Jika Login Berhasil:
+                // Simpan data user ke dalam 'localStorage' browser agar sesi login bertahan
+                localStorage.setItem('userLoggedIn', JSON.stringify(user));
+                
+                showToast("Login Berhasil! Mengalihkan...", true); // Tampilkan alert sukses
+                
+                // Berpindah ke halaman dashboard setelah 1.5 detik
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } else {
+                // Jika Login Gagal:
+                showToast("password atau user salah"); // Sesuai instruksi user
+            }
+        });
+
+        // --- FUNGSI DUMMY: LUPA PASSWORD ---
+        function submitForgot() {
+            const email = document.getElementById('forgotEmail').value;
+            if(!email) {
+                showToast("Harap isi email!");
+                return;
+            }
+            // Simulasi sukses kirim email
+            showToast("Tautan reset password telah dikirim ke " + email, true);
+            closeStok('forgotPopup'); // Tutup stok setelah selesai
+        }
+
+        // --- FUNGSI DUMMY: PENDAFTARAN (REGISTER) ---
+        function submitRegister() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            // Pastikan tidak ada kolom yang kosong
+            if(!name || !email || !password) {
+                showToast("Semua field harus diisi!");
+                return;
+            }
+            // Simulasi pendaftaran sukses
+            showToast("Pendaftaran berhasil untuk " + name, true);
+            closeStok('registerPopup'); // Tutup stok pendaftaran
+        }
+    </script>
+</body>
+</html>
