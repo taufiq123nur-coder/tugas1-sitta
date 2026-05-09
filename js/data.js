@@ -149,3 +149,66 @@ var dataTracking = {
     ]
   }
 };
+
+var dataHistori = [
+  {
+    id: "DO-2023001234",
+    tanggal: "2025-08-25 10:12:20",
+    jenis: "Kirim",
+    item: "Pengantar Ilmu Komunikasi",
+    qty: 2,
+    penerima: "Rina Wulandari",
+    status: "Diproses",
+    admin: "Admin SITTA"
+  },
+  {
+    id: "DO-2023005678",
+    tanggal: "2025-08-25 11:30:45",
+    jenis: "Kirim",
+    item: "Perkembangan Anak Usia Dini",
+    qty: 1,
+    penerima: "Agus Pranoto",
+    status: "Selesai",
+    admin: "Siti Marlina"
+  },
+  {
+    id: "STK-20250001",
+    tanggal: "2025-08-24 09:00:00",
+    jenis: "Masuk",
+    item: "Manajemen Keuangan",
+    qty: 500,
+    penerima: "Gudang Pusat",
+    status: "Selesai",
+    admin: "Admin SITTA"
+  },
+  {
+    id: "DO-2023009911",
+    tanggal: "2025-08-26 14:20:10",
+    jenis: "Kirim",
+    item: "Mikrobiologi Dasar",
+    qty: 3,
+    penerima: "Doni Setiawan",
+    status: "Gagal",
+    admin: "Siti Marlina"
+  },
+  {
+    id: "ADJ-0092",
+    tanggal: "2025-08-27 10:00:00",
+    jenis: "Koreksi",
+    item: "Kepemimpinan",
+    qty: -5,
+    penerima: "-",
+    status: "Selesai",
+    admin: "Admin SITTA"
+  },
+  {
+    id: "DO-2023008822",
+    tanggal: "2025-08-27 15:45:00",
+    jenis: "Kirim",
+    item: "Manajemen Keuangan",
+    qty: 5,
+    penerima: "Budi Santoso",
+    status: "Diproses",
+    admin: "Admin SITTA"
+  }
+];
